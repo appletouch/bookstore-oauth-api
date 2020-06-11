@@ -12,10 +12,11 @@ var (
 )
 
 func StartApplication() {
-	accesstokenService := access_token.NewService(db.NewRepository())
-	accesstokenHandler := http.NewAccessTokenHandler(accesstokenService)
+
+	accesstokenHandler := http.NewAccessTokenHandler(access_token.NewService(db.NewRepository()))
 
 	ginEngine.GET("/oauth/access_token/:access_token_id", accesstokenHandler.GetById)
+	ginEngine.POST("/oauth/access_token", accesstokenHandler.Create)
 
 	ginEngine.Run(":3001")
 

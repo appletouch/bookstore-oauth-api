@@ -1,6 +1,7 @@
 # Binaries for programs and plugins
-../.idea
-.idea
+.idea/
+portainer-data/
+cassandraDB/data/
 *.exe
 *.exe~
 *.dll
