@@ -1,6 +1,8 @@
 package access_token
 
 import (
+	"fmt"
+	"github.com/appletouch/bookstore-oauth-api/src/utils/cryptos"
 	"github.com/appletouch/bookstore-oauth-api/src/utils/errors"
 	"strings"
 	"time"
@@ -8,7 +10,9 @@ import (
 
 const (
 	//number of hours a at is valid.
-	accesstokenTTL = 24
+	accesstokenTTL             = 24
+	grantTypePassword          = "password"
+	grandTypeClientCredentials = "client_credentials"
 )
 
 //ACCESS TOKEN
@@ -23,8 +27,9 @@ func (AT *AccessToken) IsExpired() bool {
 	return time.Unix(AT.Expires, 0).Before(time.Now().UTC())
 }
 
-func GetNewAccesstoken() AccessToken {
+func GetNewAccessToken(userId int64) AccessToken {
 	return AccessToken{
+		UserId:  userId,
 		Expires: time.Now().UTC().Add(accesstokenTTL * time.Hour).Unix(),
 	}
 }
@@ -50,16 +55,15 @@ func (at *AccessToken) Validate() *errors.RestErr {
 //ACCESS TOKEN REQUEST
 type AccessTokenRequest struct {
 	GrantType string `json:"grant_type"`
+	Scope     string `json:"scope"`
 
 	//Used for password grant type
-	Email    string `json:"access_token"`
-	Password string `json:"user_id"`
+	UserName string `json:"username"`
+	Password string `json:"password"`
 
 	//Used for client credentials
 	ClientId     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
-
-	Scope string `json:"scope"`
 }
 
 func (atr *AccessTokenRequest) Validate() *errors.RestErr {
@@ -67,10 +71,10 @@ func (atr *AccessTokenRequest) Validate() *errors.RestErr {
 	atr.GrantType = strings.TrimSpace(atr.GrantType)
 
 	switch atr.GrantType {
-	case "password":
-		atr.Email = strings.TrimSpace(atr.Email)
+	case grantTypePassword:
+		atr.UserName = strings.TrimSpace(atr.UserName)
 		atr.Password = strings.TrimSpace(atr.Password)
-		if atr.Email == "" {
+		if atr.UserName == "" {
 			return errors.New(400)
 		}
 		if atr.Password == "" {
@@ -78,7 +82,7 @@ func (atr *AccessTokenRequest) Validate() *errors.RestErr {
 		}
 		break
 
-	case "ClientCredentials":
+	case grandTypeClientCredentials:
 		if atr.ClientId == "" {
 			return errors.New(400)
 		}
@@ -92,4 +96,8 @@ func (atr *AccessTokenRequest) Validate() *errors.RestErr {
 	}
 
 	return nil
+}
+
+func (at *AccessToken) Generate() {
+	at.Access_Token = cryptos.GetMd5(fmt.Sprintf("at-%d-%d-ran", at.UserId, at.Expires))
 }

@@ -6,7 +6,7 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"encoding/hex"
-	"github.com/appletouch/bookstore-users_api/logger"
+	"github.com/appletouch/bookstore-oauth-api/src/logger"
 	"io"
 )
 

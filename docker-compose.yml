@@ -149,6 +149,7 @@ services:
       - ./portainer-data:/data
     # Enable you to access potainers web interface from your host machine
     # using http://localhost:10001
+    # admin / admin
     ports:
       - "10001:9000"
 networks:

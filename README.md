@@ -21,6 +21,14 @@ This is a Domain Driven Design
     
 `go get github.com/gocql/gocql`
 
+
+##Portainer
+http://localhost:10001
+user: admin
+pwd: admin2020 //or other welknown password you like to use.  
+
+
+
 ##Databases (Cassandra)
 
 **Run cassandra start script "createCluster.sh"** ( NEED ENOUGH MEMMORY TO RUN THREE NODES=>2.2GB /node)

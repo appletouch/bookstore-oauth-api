@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	restClient = rest.RequestBuilder{
+	usersRestClient = rest.RequestBuilder{
 		BaseURL: "http://localhost:3000",
 		Timeout: 100 * time.Millisecond,
 	}
@@ -28,12 +28,12 @@ func NewRespository() UsersRepositoryInterface {
 }
 
 func (us *usersRepository) Login(email string, password string) (*users.User, *errors.RestErr) {
-	request := users.LoginRequest{
+	request := users.UserLoginRequest{
 		Email:    email,
 		Password: password,
 	}
 
-	response := restClient.Post("/users/user/login", request)
+	response := usersRestClient.Post("/users/user/login", request)
 
 	// no response when we have een timeou
 	if response == nil || response.Response == nil {

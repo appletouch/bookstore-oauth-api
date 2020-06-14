@@ -4,6 +4,7 @@ package http
 
 import (
 	"github.com/appletouch/bookstore-oauth-api/src/domain/access_token"
+	"github.com/appletouch/bookstore-oauth-api/src/services"
 	"github.com/appletouch/bookstore-oauth-api/src/utils/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -15,7 +16,7 @@ type AccesstokenHandlerInterface interface {
 	Create(*gin.Context)
 }
 type accessTokenHandler struct {
-	service access_token.ServiceInterface
+	service services.ServiceInterface
 }
 
 func (handler *accessTokenHandler) GetById(ctx *gin.Context) {
@@ -29,21 +30,37 @@ func (handler *accessTokenHandler) GetById(ctx *gin.Context) {
 }
 
 func (handler *accessTokenHandler) Create(ctx *gin.Context) {
-	var at access_token.AccessToken
-	if err := ctx.ShouldBindJSON(&at); err != nil {
-		restErr := errors.New(400, err.Error())
+	var request access_token.AccessTokenRequest
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		restErr := errors.RestErr{400, "Bad Request", "Invalid Json body"}
 		ctx.JSON(restErr.Status, restErr)
 		return
 	}
-	if err := handler.service.Create(at); err != nil {
+	accessToken, err := handler.service.Create(request)
+	if err != nil {
 		ctx.JSON(err.Status, err)
+		return
 	}
-
-	ctx.JSON(http.StatusCreated, at)
+	ctx.JSON(http.StatusOK, accessToken)
 
 }
 
-func NewAccessTokenHandler(service access_token.ServiceInterface) AccesstokenHandlerInterface {
+//func (handler *accessTokenHandler) Create(ctx *gin.Context) {
+//	var at access_token.AccessToken
+//	if err := ctx.ShouldBindJSON(&at); err != nil {
+//		restErr := errors.New(400, err.Error())
+//		ctx.JSON(restErr.Status, restErr)
+//		return
+//	}
+//	if err := handler.service.Create(at); err != nil {
+//		ctx.JSON(err.Status, err)
+//	}
+//
+//	ctx.JSON(http.StatusCreated, at)
+//
+//}
+
+func NewAccessTokenHandler(service services.ServiceInterface) AccesstokenHandlerInterface {
 	return &accessTokenHandler{
 		service: service,
 	}
